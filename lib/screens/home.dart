@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/screens/message_screen.dart';
+import 'package:test_project/screens/navigation_screen.dart';
 import 'package:test_project/services/helper_functions.dart';
 import 'package:is_lock_screen/is_lock_screen.dart';
 import 'package:test_project/screens/test_hardware.dart';
-import 'package:test_project/screens/navigation_screen.dart';
 import 'package:test_project/services/mqtt_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class Home extends StatefulWidget {
-  Home({super.key, required this.title});
   String title;
+
+  Home({Key key, this.title}) : super(key: key);
   @override
   State<Home> createState() => _HomeState();
 }
@@ -27,7 +28,7 @@ class _HomeState extends State<Home> {
     _service.publish("location-status", location.toString());
   }
 
-  Future<bool?> checkScreen() async {
+  Future<bool> checkScreen() async {
     return await isLockScreen();
   }
 
@@ -64,7 +65,7 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                bool? isLock = await checkScreen();
+                bool isLock = await checkScreen();
                 _service.publish("screen-status", isLock.toString());
               },
               child: const Text("Check Screen"),
@@ -100,7 +101,7 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const NavigationScreen(),
+                    builder: (_) => NavigationScreen(),
                   ),
                 );
               },

@@ -1,27 +1,24 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:convert';
-import 'dart:async';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:test_project/services/conn_state.dart';
 
 class MQTTService{
   MQTTService({this.host, this.port, this.topic, this.msg});
 
-  final String? host;
+  final String host;
 
-  final int? port;
+  final int port;
 
-  final String? topic;
+  final String topic;
 
-  String? msg;
+  String msg;
 
-  static MqttServerClient? client;
+  static MqttServerClient client;
 
-  static String? updatedMsg;
+  static String updatedMsg;
 
   static bool isConnected = false;
 
@@ -29,8 +26,8 @@ class MQTTService{
       BehaviorSubject<ConnState>();      
 
   Future<void> initializeMQTTClient() async {
-    client = MqttServerClient(host!, 'anshjj')
-      ..port = port!
+    client = MqttServerClient(host, 'anshjj')
+      ..port = port
       ..logging(on: false)
       ..onDisconnected = onDisConnected
       ..onSubscribed = onSubscribed
@@ -40,7 +37,7 @@ class MQTTService{
       ..disconnectOnNoPingResponse(MyDisconnectOnNoPingResponse())
       ..autoReconnect = true;
 
-    if(client!.connectionStatus!.state == MqttConnectionState.faulted) {
+    if(client.connectionStatus.state == MqttConnectionState.faulted) {
         print("Faluted true");
       }
 
@@ -49,24 +46,24 @@ class MQTTService{
         .startClean()
         .authenticateAs("cp", "smart@123");
     log('Connecting....');
-    client!.connectionMessage = connMess;
+    client.connectionMessage = connMess;
   }
   
 
   Future connectMQTT() async {
     try {
       _broadcastConnectionState();
-      await client!.connect();
+      await client.connect();
       _broadcastConnectionState();
     } on NoConnectionException catch (e) {
       log(e.toString());
-      client!.disconnect();
+      client.disconnect();
     }
   }
 
   void disConnectMQTT() {
     try {
-      client!.disconnect();
+      client.disconnect();
     } catch (e) {
       log(e.toString());
     }
@@ -86,11 +83,11 @@ class MQTTService{
       _cnxBehavior.add(ConnState.disconnected);
       return;
     }
-    if (client!.connectionStatus == null) {
+    if (client.connectionStatus == null) {
       _cnxBehavior.add(ConnState.disconnected);
       return;
     }
-    switch (client!.connectionStatus!.state) {
+    switch (client.connectionStatus.state) {
       case MqttConnectionState.disconnecting:
         _cnxBehavior.add(ConnState.disconnecting);
         break;
@@ -117,10 +114,10 @@ class MQTTService{
     final builder = MqttClientPayloadBuilder();
     builder.addString(message);
 
-    client!.publishMessage(
+    client.publishMessage(
       topic,
       MqttQos.atLeastOnce,
-      builder.payload!,
+      builder.payload,
     );
     builder.clear();
   }

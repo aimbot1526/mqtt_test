@@ -10,7 +10,8 @@ import 'package:path/path.dart' as path;
 import 'package:flutter_sound/flutter_sound.dart';
 
 class TestHardware extends StatefulWidget {
-  const TestHardware({super.key});
+  const TestHardware({Key key}) : super(key: key);
+
 
   @override
   State<TestHardware> createState() => _TestHardwareState();
@@ -21,9 +22,9 @@ class _TestHardwareState extends State<TestHardware> {
   bool _isRecording = false;
   String recordBtn = "Record Video";
   String audioBtn = "Record Audio";
-  late CameraController _cameraController;
+   CameraController _cameraController;
   final FlutterSoundRecorder _mRecorder = FlutterSoundRecorder();
-  String? pathToAudio;
+  String pathToAudio;
   bool isAudioRecording = false;
 
   @override
@@ -45,7 +46,11 @@ class _TestHardwareState extends State<TestHardware> {
   }
 
   Future<void> startRecording() async {
-    Directory directory = Directory(path.dirname(pathToAudio!));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Recording started"),
+      duration: Duration(seconds: 1),
+    ));
+    Directory directory = Directory(path.dirname(pathToAudio));
     if (!directory.existsSync()) {
       directory.createSync();
     }
@@ -60,12 +65,20 @@ class _TestHardwareState extends State<TestHardware> {
   }
 
   void stopRecorder() {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Recording stopped"),
+      duration: Duration(seconds: 1),
+    ));
     _mRecorder.stopRecorder().then((value) {
       setState(() {
         isAudioRecording = true;
         audioBtn = "Record Audio";
       });
     });
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Photo Clicked"),
+      duration: Duration(seconds: 1),
+    ));
   }
 
   @override
@@ -80,12 +93,18 @@ class _TestHardwareState extends State<TestHardware> {
     final back = cameras.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.back);
     // if(back.lensDirection)
-    _cameraController = CameraController(back, ResolutionPreset.max);
+    _cameraController = CameraController(back, ResolutionPreset.medium);
     await _cameraController.initialize();
     setState(() => _isLoading = false);
   }
 
   _recordVideo() async {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: _isRecording == false
+          ? const Text("Recording started")
+          : const Text("Recording stopped!"),
+      duration: const Duration(seconds: 1),
+    ));
     if (_isRecording) {
       final file = await _cameraController.stopVideoRecording();
       setState(() {
@@ -114,61 +133,62 @@ class _TestHardwareState extends State<TestHardware> {
       );
     } else {
       return Scaffold(
-          appBar: AppBar(
-            title: const Text("Test"),
-          ),
-          body: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Column(
-                children: [
-                  Stack(
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height / 2,
-                        width: MediaQuery.of(context).size.width,
-                        child: CameraPreview(_cameraController),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _recordVideo();
-                        },
-                        child: Text(recordBtn),
+        appBar: AppBar(
+          title: const Text("Test"),
+        ),
+        body: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              // height: MediaQuery.of(context).size.height / 2,
+              // width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              width: MediaQuery.of(context).size.width,
+              child: CameraPreview(_cameraController),
+            ),
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _recordVideo();
+                  },
+                  child: Text(recordBtn),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    audioBtn == "Record Audio"
+                        ? startRecording()
+                        : stopRecorder();
+                  },
+                  child: Text(audioBtn),
+                ),
+                const SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Photo Clicked"),
+                        duration: Duration(seconds: 1),
                       ),
-                      const SizedBox(width: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          audioBtn == "Record Audio"
-                              ? startRecording()
-                              : stopRecorder();
-                        },
-                        child: Text(audioBtn),
-                      ),
-                      const SizedBox(width: 20),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final image = await _cameraController.takePicture();
-                          await HelperFunctions.saveXFileToFolder(image);
-                        },
-                        child: const Text("Take photo"),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {},
-                    child: const Text("Check Files"),
-                  ),
-                ],
-              )
-            ],
-          ));
+                    );
+                    final image = await _cameraController.takePicture();
+                    await HelperFunctions.saveXFileToFolder(image);
+                  },
+                  child: const Text("Take photo"),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // ElevatedButton(
+            //   onPressed: () async {},
+            //   child: const Text("Check Files"),
+            // ),
+          ],
+        ),
+      );
     }
   }
 }

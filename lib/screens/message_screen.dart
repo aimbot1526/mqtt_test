@@ -9,50 +9,50 @@ import 'package:test_project/services/mqtt_service.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 class MessageScreen extends StatefulWidget {
-  const MessageScreen({super.key, required this.mqttService});
   final MQTTService mqttService;
+
+  const MessageScreen({Key key, this.mqttService}) : super(key: key);
   @override
   // ignore: library_private_types_in_public_api
   _MessageScreenState createState() => _MessageScreenState();
 }
 
 class _MessageScreenState extends State<MessageScreen> {
-  bool? isConnected;
-  StreamSubscription<ConnState>? _cnxSubscription;
+  bool isConnected;
+  StreamSubscription<ConnState> _cnxSubscription;
   final TextEditingController _messageController = TextEditingController();
   StreamController<List<MessageModel>> chatController =
       StreamController.broadcast();
   List<MessageModel> messageList = [];
-  MQTTService? _service;
   @override
   void dispose() {
     _messageController.dispose();
     chatController.close();
-    _cnxSubscription!.cancel();
+    _cnxSubscription.cancel();
     super.dispose();
   }
 
   @override
   void initState() {
-      MQTTService.client!.subscribe('publishing-messages', MqttQos.atMostOnce);
-      MQTTService.client!.updates!.listen((dynamic t) {
-        final MqttPublishMessage recMess = t[0].payload;
-        final message = MqttPublishPayload.bytesToStringAsString(
-          recMess.payload.message,
-        );
-        final data = jsonDecode(message);
-        setState(() {
-          messageList.add(
-              MessageModel(message: data['message'], sentBy: data['sentBy']));
-        });
-        chatController.add(messageList);
+    MQTTService.client.subscribe('publishing-messages', MqttQos.atMostOnce);
+    MQTTService.client.updates.listen((dynamic t) {
+      final MqttPublishMessage recMess = t[0].payload;
+      final message = MqttPublishPayload.bytesToStringAsString(
+        recMess.payload.message,
+      );
+      final data = jsonDecode(message);
+      setState(() {
+        messageList.add(
+            MessageModel(message: data['message'], sentBy: data['sentBy']));
       });
-      _cnxSubscription = MQTTService.connectionStateStream().listen((state) {
-        log('This is the connection state now:$state');
-        setState(() {
-          isConnected = true;
-        });
+      chatController.add(messageList);
+    });
+    _cnxSubscription = MQTTService.connectionStateStream().listen((state) {
+      log('This is the connection state now:$state');
+      setState(() {
+        isConnected = true;
       });
+    });
     super.initState();
   }
 
@@ -71,9 +71,9 @@ class _MessageScreenState extends State<MessageScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return ListView.builder(
-                    itemCount: snapshot.data!.length,
+                    itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
-                      final data = snapshot.data![index];
+                      final data = snapshot.data[index];
                       return Message(
                         text: data.message,
                         isSent: data.sentBy == "User 1",
@@ -120,7 +120,7 @@ class _MessageScreenState extends State<MessageScreen> {
                             sentBy: "User 1",
                           ),
                         );
-                        _service!.publish(
+                        widget.mqttService.publish(
                           "reciever-messages",
                           jsonEncode(
                             MessageModel(
@@ -148,9 +148,9 @@ class Message extends StatelessWidget {
   final bool isSent;
 
   const Message({
-    Key? key,
-    required this.text,
-    required this.isSent,
+    Key key,
+     this.text,
+     this.isSent,
   }) : super(key: key);
 
   @override

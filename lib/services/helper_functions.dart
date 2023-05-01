@@ -56,19 +56,19 @@ class HelperFunctions {
   }
 
   static Future<Uint8List> getBytesFromAsset(
-      {required String path, required int width}) async {
+      { String path,  int width}) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width, targetHeight: 200);
+        targetWidth: width, targetHeight: 150);
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))
         .buffer
         .asUint8List();
   }
 
   static Future<void> changeImageToMarker() async {
     customMarker =
-        await getBytesFromAsset(path: "assets/images/car.png", width: 100);
+        await getBytesFromAsset(path: "assets/images/car.png", width: 150);
   }
 
   static Future<void> saveXFileToFolder(XFile xFile) async {

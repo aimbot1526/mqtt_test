@@ -1,12 +1,12 @@
 class MessageModel {
   MessageModel({
-    required this.message,
-    required this.sentBy,
+     this.message,
+     this.sentBy,
   });
-  late final String message;
-  late final String sentBy;
+   String message;
+   String sentBy;
   
-  MessageModel.fromJson(Map<String, dynamic> json){
+  MessageModel.fromJson(Map<String, dynamic> json, this.message, this.sentBy){
     message = json['message'];
     sentBy = json['sentBy'];
   }

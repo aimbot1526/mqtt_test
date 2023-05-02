@@ -1,15 +1,16 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/animation.dart';
+import 'package:latlong2/latlong.dart';
 
 class CustomTween extends Tween<LatLng> {
-  CustomTween({LatLng begin, LatLng end})
+  CustomTween({ LatLng begin,  LatLng end})
       : super(begin: begin, end: end);
 
   @override
-  LatLng lerp(double t) => LatLng(
-        lerpDouble(begin.latitude, end.latitude, t),
-        lerpDouble(begin.longitude, end.longitude, t),
-      );
+  LatLng lerp(double t) {
+    double lat = lerpDouble(begin.latitude, end.latitude, t);
+    double lng = lerpDouble(begin.longitude, end.longitude, t);
+    return LatLng(lat, lng);
+  }
 }

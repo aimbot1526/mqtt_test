@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:test_project/services/custom_tween.dart';
 import 'package:test_project/services/helper_functions.dart';
 import 'package:flutter_animarker/flutter_map_marker_animation.dart';
 
@@ -54,7 +53,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         _markers[markerId] = Marker(
           markerId: markerId,
           icon: BitmapDescriptor.fromBytes(HelperFunctions.customMarker),
-          rotation: 270,
+          rotation: 180,
           position: LatLng(p.latitude, p.longitude),
         );
       });
@@ -94,7 +93,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       body: HelperFunctions.myLatitude == 0 && HelperFunctions.myLongtitude == 0
           ? const Center(child: Text("Loading"))
           : Animarker(
-              mapId: _mapController.future.then<int>((value) => value.mapId),
+              // mapId: _mapController.future.then<int>((value) => value.mapId),
               isActiveTrip: true,
               useRotation: true,
               zoom: zoom,
@@ -105,9 +104,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
               child: GoogleMap(
                 zoomControlsEnabled: false,
                 initialCameraPosition: initialCameraPostion,
-                onMapCreated: (controller) {
-                  _mapController.complete(controller);
-                },
+                // onMapCreated: (controller) {
+                //   _mapController.complete(controller);
+                // },
                 onCameraMove: (position) =>
                     setState(() => zoom = position.zoom),
               ),
@@ -115,17 +114,3 @@ class _NavigationScreenState extends State<NavigationScreen> {
     );
   }
 }
-
-// markers: {
-//                   Marker(
-//                     markerId: const MarkerId("source"),
-//                     position: currentLocation,
-//                     icon: BitmapDescriptor.fromBytes(
-//                       HelperFunctions.customMarker,
-//                     ),
-//                   ),
-//                   Marker(
-//                     markerId: const MarkerId("destination"),
-//                     position: sourceDestination,
-//                   ),
-//                 },

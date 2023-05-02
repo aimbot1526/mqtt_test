@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/screens/message_screen.dart';
 import 'package:test_project/screens/navigation_screen.dart';
+import 'package:test_project/screens/test_navigation_screen.dart';
 import 'package:test_project/services/helper_functions.dart';
 import 'package:is_lock_screen/is_lock_screen.dart';
 import 'package:test_project/screens/test_hardware.dart';
@@ -101,7 +102,7 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => NavigationScreen(),
+                    builder: (_) => const TestNavigationScreen(),
                   ),
                 );
               },

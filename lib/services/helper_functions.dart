@@ -68,7 +68,7 @@ class HelperFunctions {
 
   static Future<void> changeImageToMarker() async {
     customMarker =
-        await getBytesFromAsset(path: "assets/images/car.png", width: 150);
+        await getBytesFromAsset(path: "assets/images/car.png", width: 100);
   }
 
   static Future<void> saveXFileToFolder(XFile xFile) async {

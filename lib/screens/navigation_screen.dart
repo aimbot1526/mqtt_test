@@ -34,15 +34,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Random random = Random();
 
   @override
-  void dispose() {
-    positionStream.cancel();
-    _mapController.future.then((value) => {
-      value.dispose()
-    });
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
     positionStream =
@@ -55,6 +46,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           icon: BitmapDescriptor.fromBytes(HelperFunctions.customMarker),
           rotation: 180,
           position: LatLng(p.latitude, p.longitude),
+          anchor: const Offset(0.5, 1)
         );
       });
 
@@ -72,7 +64,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
         });
       });
     });
-    // _getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    positionStream.cancel();
+    _mapController.future.then((value) => {value.dispose()});
+    super.dispose();
   }
 
   static CameraPosition initialCameraPostion = CameraPosition(
@@ -93,23 +91,24 @@ class _NavigationScreenState extends State<NavigationScreen> {
       body: HelperFunctions.myLatitude == 0 && HelperFunctions.myLongtitude == 0
           ? const Center(child: Text("Loading"))
           : Animarker(
-              // mapId: _mapController.future.then<int>((value) => value.mapId),
+              // useRotation: true,
+              mapId: _mapController.future.then<int>((value) => value.mapId),
               isActiveTrip: true,
-              useRotation: true,
+              // useRotation: true,
               zoom: zoom,
               // calculate ping timeline and make dynamic
               duration: const Duration(milliseconds: 3000),
               onStopover: onStopover,
               markers: <Marker>{..._markers.values.toSet()},
               child: GoogleMap(
-                zoomControlsEnabled: false,
-                initialCameraPosition: initialCameraPostion,
-                // onMapCreated: (controller) {
-                //   _mapController.complete(controller);
-                // },
-                onCameraMove: (position) =>
-                    setState(() => zoom = position.zoom),
-              ),
+                  zoomControlsEnabled: false,
+                  initialCameraPosition: initialCameraPostion,
+                  onMapCreated: (controller) {
+                    _mapController.complete(controller);
+                  },
+                  onCameraMove: (position) {
+                    setState(() => zoom = position.zoom);
+                  }),
             ),
     );
   }

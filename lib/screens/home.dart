@@ -102,11 +102,23 @@ class _HomeState extends State<Home> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    builder: (_) => NavigationScreen(),
+                  ),
+                );
+              },
+              child: const Text("Google map"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                     builder: (_) => const TestNavigationScreen(),
                   ),
                 );
               },
-              child: const Text("Show location"),
+              child: const Text("Leaflet map"),
             ),
           ],
         ),
